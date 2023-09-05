@@ -1,3 +1,4 @@
+from fastapi import FastAPI
 import json
 import random
 
@@ -13,5 +14,14 @@ studies = random.choice(stats['human']['studies'])
 
 human = Human(name, lastName, physical, studies)
 
-if __name__ == '__main__':
-    print(human)
+app = FastAPI()
+
+
+@app.get("/")
+async def root():
+    return {"message": "Hello World"}
+
+
+@app.get("/hello/{name}")
+async def say_hello(name: str):
+    return {"message": f"Hello {name}"}
