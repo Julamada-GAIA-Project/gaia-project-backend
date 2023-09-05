@@ -1,1 +1,1 @@
-# gaia-project-backend
+# GAIA Project Backend
