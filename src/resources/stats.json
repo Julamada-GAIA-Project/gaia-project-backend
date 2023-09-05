@@ -1,0 +1,22 @@
+{
+    "human": {
+        "names": [
+            "Chema",
+            "Alfonso",
+            "Cabri",
+            "Cozar",
+            "Martin",
+            "Rasty"
+        ],
+        "lastNames": [
+            "Mcnroe"
+        ],
+        "physical": [1, 2, 3, 4, 5, 6, 7, 8, 9, 10],
+        "studies": [
+            "None",
+            "Graduate",
+            "Bachelor",
+            "Master"
+        ]
+    }
+}
