@@ -1,29 +1,20 @@
-from fastapi import FastAPI
-from azure.cosmos import CosmosClient, exceptions
 import json
 import random
 import os
-    
-## COSMODB CONNECTION ##
-# CosmoDB Params
-endpoint = os.environ.get("COSMODB_URI")
-key = os.environ.get("COSMODB_KEY")
-database_name = os.environ.get("COSMODB_NAME")
-container_name = os.environ.get("COSMODB_CONTAINER")
 
-# Cosmo Client
-client = CosmosClient(endpoint, key)
+from typing import List
+from fastapi import FastAPI, HTTPException
+from pymongo import MongoClient
 
-# Obtains BDD or creates it
-try:
-    database = client.get_database_client(database_name)
-except exceptions.CosmosResourceNotFoundError:
-    database = client.create_database_if_not_exists(database_name)
+from src.models.Human import Human
     
-try:
-    container = database.get_container_client(container_name)
-except exceptions.CosmosResourceNotFoundError:
-    container = database.create_container_if_not_exists(id=container_name)
+## MONGODB CONNECTION ##
+# MongoDB Params
+mongodb_uri = os.getenv('MONGODB_URI') 
+
+# Mongo Client
+client = MongoClient(mongodb_uri)
+db = client.get_database('gaia-dev')
 
 # Init
 app = FastAPI()
@@ -31,10 +22,25 @@ app = FastAPI()
 ## ENDPOINTS ##
 # Post Human
 @app.post("/humans")
-async def post_human(data: dict):
-    response = container.create_item(body=data)
-    return {"message": "Human Post success", "item_id": response["id"]}
+async def post_human(human: Human):
+    result = db.humans.insert_one(human.dict())
+    return {"message": "Human created successfully", "human_id": str(result.inserted_id)}
 
-@app.post("/hello")
-async def post_human(data: dict):
-    return {"message": "Hello world!"}
+# Get Human by id
+@app.get("/humans/{human_id}", response_model=Human)
+async def get_human_by_id(human_id: str):
+    human_data = db['humans'].find_one({"_id": human_id})
+    if human_data:
+        return Human(**human_data)
+    else:
+        raise HTTPException(status_code=404, detail="Human not found")
+
+# Get All humans
+@app.get("/humans", response_model=List[Human])
+async def get_all_humans():
+    humans = []
+    cursor = db['humans'].find()
+    for human_data in cursor:
+        human = Human(**human_data)
+        humans.append(human)
+    return humans
