@@ -2,13 +2,14 @@ from fastapi import FastAPI
 from azure.cosmos import CosmosClient, exceptions
 import json
 import random
+import os
     
 ## COSMODB CONNECTION ##
 # CosmoDB Params
-endpoint = ""
-key = ""
-database_name = ""
-container_name = ""
+endpoint = os.environ.get("COSMODB_URI")
+key = os.environ.get("COSMODB_KEY")
+database_name = os.environ.get("COSMODB_NAME")
+container_name = os.environ.get("COSMODB_CONTAINER")
 
 # Cosmo Client
 client = CosmosClient(endpoint, key)
@@ -34,18 +35,6 @@ async def post_human(data: dict):
     response = container.create_item(body=data)
     return {"message": "Human Post success", "item_id": response["id"]}
 
-# Post Random Human
-@app.post("/humans/random")
-async def post_human():
-    with open('resources/stats.json') as statsJson:
-        stats = json.load(statsJson)
-
-    data = {
-        "name": random.choice(stats['human']['names']),
-        "lastName": random.choice(stats['human']['lastNames']),
-        "physical": random.choice(stats['human']['physical']),
-        "studies": random.choice(stats['human']['studies'])
-    }
-
-    response = container.create_item(body=data)
-    return {"message": "Datos insertados en Cosmos DB", "item_id": response["id"]}
+@app.post("/hello")
+async def post_human(data: dict):
+    return {"message": "Hello world!"}
