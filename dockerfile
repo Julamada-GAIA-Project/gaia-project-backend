@@ -2,10 +2,7 @@ FROM python:3.8-slim
 
 WORKDIR /app
 
-ENV COSMODB_URI = ""
-ENV COSMODB_KEY = ""
-ENV COSMODB_NAME = ""
-ENV COSMODB_CONTAINER = ""
+ENV MONGODB_URI = ""
 
 COPY requirements.txt .
 
